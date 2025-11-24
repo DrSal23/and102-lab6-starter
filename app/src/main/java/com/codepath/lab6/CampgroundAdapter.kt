@@ -41,8 +41,11 @@ class CampgroundAdapter(private val context: Context, private val campgrounds: L
             campgroundDescriptionTextView.text = campground.description
             campgroundLatLongTextView.text = campground.latLong
 
+            // FIX: NPS API uses images[0].url
+            val imageUrl = campground.images?.firstOrNull()?.url
+
             Glide.with(context)
-                .load(campground.imageUrl)
+                .load(imageUrl)
                 .into(campgroundImageView)
         }
 

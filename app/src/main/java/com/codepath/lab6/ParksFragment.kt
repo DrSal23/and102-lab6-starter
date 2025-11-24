@@ -10,48 +10,48 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.codepath.asynchttpclient.AsyncHttpClient
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler
-import com.codepath.lab6.createJson   // <-- REQUIRED FIX
+import com.codepath.lab6.createJson
 import okhttp3.Headers
 import org.json.JSONException
 
-class CampgroundFragment : Fragment() {
+private const val TAG = "ParksFragment"
+private const val API_KEY = BuildConfig.API_KEY
+private const val PARKS_URL =
+    "https://developer.nps.gov/api/v1/parks?api_key=${API_KEY}"
 
-    private val campgrounds = mutableListOf<Campground>()    // FIXED
-    private lateinit var campgroundRecyclerView: RecyclerView
-    private lateinit var campgroundAdapter: CampgroundAdapter
+class ParksFragment : Fragment() {
 
-    companion object {
-        private const val TAG = "CampgroundFragment"
-        private const val API_KEY = BuildConfig.API_KEY
-        private const val CAMPGROUND_URL =
-            "https://developer.nps.gov/api/v1/campgrounds?api_key=$API_KEY"
-
-        fun newInstance() = CampgroundFragment()
-    }
+    private val parks = mutableListOf<Park>()
+    private lateinit var parksRecyclerView: RecyclerView
+    private lateinit var parksAdapter: ParksAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_campground, container, false)
+        val view = inflater.inflate(R.layout.fragment_parks, container, false)
 
-        campgroundRecyclerView = view.findViewById(R.id.campgrounds)
-        campgroundRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        campgroundAdapter = CampgroundAdapter(requireContext(), campgrounds)
-        campgroundRecyclerView.adapter = campgroundAdapter
+        parksRecyclerView = view.findViewById(R.id.parks)
+        parksRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        parksAdapter = ParksAdapter(requireContext(), parks)
+        parksRecyclerView.adapter = parksAdapter
 
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        fetchCampgrounds()
+        fetchParks()
     }
 
-    private fun fetchCampgrounds() {
+    companion object {
+        fun newInstance() = ParksFragment()
+    }
+
+    private fun fetchParks() {
         val client = AsyncHttpClient()
-        client.get(CAMPGROUND_URL, object : JsonHttpResponseHandler() {
+        client.get(PARKS_URL, object : JsonHttpResponseHandler() {
 
             override fun onFailure(
                 statusCode: Int,
@@ -59,21 +59,21 @@ class CampgroundFragment : Fragment() {
                 response: String?,
                 throwable: Throwable?
             ) {
-                Log.e(TAG, "Failed to fetch campgrounds: $statusCode")
+                Log.e(TAG, "Failed to fetch parks: $statusCode")
             }
 
             override fun onSuccess(statusCode: Int, headers: Headers, json: JSON) {
-                Log.i(TAG, "Successfully fetched campgrounds: $json")
+                Log.i(TAG, "Successfully fetched parks: $json")
                 try {
                     val parsedJson = createJson().decodeFromString(
-                        CampgroundResponse.serializer(),
+                        ParksResponse.serializer(),
                         json.jsonObject.toString()
                     )
 
                     parsedJson.data?.let { list ->
-                        campgrounds.clear()
-                        campgrounds.addAll(list)
-                        campgroundAdapter.notifyDataSetChanged()   // FIXED
+                        parks.clear()
+                        parks.addAll(list)
+                        parksAdapter.notifyDataSetChanged()
                     }
 
                 } catch (e: JSONException) {

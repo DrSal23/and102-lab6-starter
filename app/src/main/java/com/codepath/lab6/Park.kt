@@ -1,6 +1,6 @@
 package com.codepath.lab6
 
-import android.support.annotation.Keep
+import androidx.annotation.Keep
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -16,13 +16,17 @@ data class ParksResponse(
 data class Park(
     @SerialName("fullName")
     val fullName: String?,
+
     @SerialName("description")
     val description: String?,
+
     @SerialName("images")
-    val images: List<ParkImage>?
+    val images: List<ParkImage>? = null
 ) : java.io.Serializable {
-    val imageUrl: String?
-        get() = images?.firstOrNull()?.url
+
+    // Safe getter — prevents all adapter errors
+    val imageUrl: String
+        get() = images?.firstOrNull()?.url ?: ""
 }
 
 @Keep

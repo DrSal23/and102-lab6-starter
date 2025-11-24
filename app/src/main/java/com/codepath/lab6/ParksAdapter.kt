@@ -38,7 +38,13 @@ class ParksAdapter(private val context: Context, private val parks: List<Park>) 
         fun bind(park: Park) {
             parkNameTextView.text = park.fullName
             parkDescriptionTextView.text = park.description
-            Glide.with(context).load(park.imageUrl).into(parkImageView)
+
+            // FIX: NPS API uses images[0].url
+            val imageUrl = park.images?.firstOrNull()?.url
+
+            Glide.with(context)
+                .load(imageUrl)
+                .into(parkImageView)
         }
 
         override fun onClick(v: View?) {
